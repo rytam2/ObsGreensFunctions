@@ -68,13 +68,14 @@ Key deps: xarray/dask/netcdf4/cftime (pangeo core), **intake-esm** + **xmip**
   *feedback* deliverable reproduces as well or better. `siconc` masking is a possible
   later refinement to recover high-latitude open ocean.)
 
-## Pipeline — three py-percent notebooks at the project root
+## Pipeline — three notebooks at the project root
 
-The three stages are **notebooks**, not modules: py-percent scripts (`# %%` cells) that
-open as notebooks in VS Code / Jupytext and also run top-to-bottom as plain scripts. Each
-walks through **CanESM5** with every intermediate visible to plot/inspect, then batches
-over all models, and ends with its figures. Run in order (each is idempotent — existing
-outputs are skipped/overwritten identically):
+The three stages are **notebooks**, not modules: tracked as `.ipynb` (source of truth), with
+the py-percent `.py` (`# %%` cells) regenerable via jupytext — the `.py` open as notebooks in
+VS Code and also run top-to-bottom as plain scripts. Each walks through **CanESM5** with every
+intermediate visible to plot/inspect, then batches over all models, and ends with its figures.
+Run in order (regenerate the `.py` first with `jupytext --to py:percent 0X.ipynb`; each stage
+is idempotent — existing outputs are skipped/overwritten identically):
 
 ```bash
 python 01_preprocess.py   # catalog -> pre-processed_data/ (annual means + sftlf)
@@ -108,11 +109,12 @@ The scientific "meat" (annual means, the ridge fit (scikit-learn `KernelRidge`, 
 cells**, defined right before use, so a first-year grad student reads the method
 top-to-bottom without opening a module.
 
-The three stages also open as real Jupyter notebooks: `jupytext --to notebook 0X.py`
-(kernel `python3` from the env); convert back with `jupytext --to py:percent 0X.ipynb`. The
-`.py` are the tracked source of truth; the `.ipynb` are gitignored/regenerable. They are
-*not* auto-paired, so edits made in the `.ipynb` must be synced back (`jupytext --to
-py:percent 0X.ipynb`) or they diverge from the `.py`.
+The three stages are tracked as **Jupyter `.ipynb` notebooks** — the source of truth. The
+py-percent `.py` are gitignored and regenerated on demand with jupytext: `jupytext --to
+py:percent 0X.ipynb` to get a script (e.g. to `python 0X.py` from the shell), `jupytext --to
+notebook 0X.py` to go back. They are *not* auto-paired, so if you edit a regenerated `.py`,
+sync it back to the `.ipynb` (`jupytext --to notebook 0X.py`) or the two diverge. (This
+flipped 2026-07 — the `.py` used to be the tracked form; see `.gitignore`.)
 
 **Synthetic SST (extension point, currently tabled).** The GFs can be forced with any
 external SST ensemble (synthetic or observed), not just historical tos. The seam is a
